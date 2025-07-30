@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route("/gerar_busca", methods=["POST"])
 def gerar_busca():
@@ -19,26 +19,37 @@ def gerar_busca():
     desfecho = data.get("desfecho", "")
 
     prompt = f"""
-    Você é um especialista em estratégias de busca no PubMed. Com base nos dados fornecidos, elabore:
+Você é um especialista em estratégias avançadas de busca científica, com experiência na construção de estratégias eficazes para o PubMed.
 
-    1. Uma pergunta de pesquisa estruturada no formato PICO.
-    2. Uma estratégia de busca otimizada para PubMed, com uso de termos MeSH, operadores booleanos e truncamentos.
+Com base nas informações abaixo, siga estas instruções:
 
-    População: {populacao}
-    Intervenção: {intervencao}
-    Comparação: {comparacao}
-    Desfecho: {desfecho}
-    """
+1. Formule uma pergunta de pesquisa estruturada no formato PICO, claramente identificando os quatro elementos (População, Intervenção, Comparação e Desfecho).
+
+2. Elabore uma estratégia de busca avançada para o PubMed, pronta para ser utilizada, com as seguintes características:
+- Inclua termos MeSH e sinônimos relevantes.
+- Use operadores booleanos (AND, OR), truncamentos (*) e parênteses de forma adequada.
+- Seja o mais abrangente possível, sem comprometer a especificidade.
+- Evite linguagem desnecessária — retorne apenas a pergunta PICO e a string da busca.
+
+Informações fornecidas:
+- População: {populacao}
+- Intervenção: {intervencao}
+- Comparação: {comparacao}
+- Desfecho: {desfecho}
+"""
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=700
+            temperature=0.4,
+            max_tokens=600
         )
 
-        resultado = response['choices'][0]['message']['content']
+        resultado = response.choices[0].message.content.strip()
         return jsonify({"resposta": resultado})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
