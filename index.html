@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador PICO + Busca PubMed</title>
+</head>
+<body>
+    <h1>Formulário PICO</h1>
+    <label>População:</label><br>
+    <input type="text" id="populacao"><br><br>
+    
+    <label>Intervenção:</label><br>
+    <input type="text" id="intervencao"><br><br>
+    
+    <label>Comparação:</label><br>
+    <input type="text" id="comparacao"><br><br>
+    
+    <label>Desfecho:</label><br>
+    <input type="text" id="desfecho"><br><br>
+    
+    <button onclick="gerarBusca()">Gerar pergunta e busca</button>
+
+    <pre id="resultado"></pre>
+
+    <script src="script.js"></script>
+</body>
+</html>
