@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
+import os
 
 app = Flask(__name__)
-CORS(app)  # Libera CORS para todas as origens — usar apenas para teste
+CORS(app, origins=["https://illustrious-sable-2979ca.netlify.app"])
 
-openai.api_key = "sua_chave_api_aqui"
-
-@app.route("/", methods=["GET"])
-def home():
-    return "Backend está rodando", 200
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/gerar", methods=["POST"])
 def gerar_busca():
@@ -38,20 +35,18 @@ Informações fornecidas:
 - Desfecho: {desfecho}"""
 
     try:
-        resposta = openai.ChatCompletion.create(
+        client = openai.OpenAI()
+        resposta = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Você é um especialista em estratégias de busca científica no PubMed."},
                 {"role": "user", "content": prompt}
             ]
         )
-        resultado = resposta["choices"][0]["message"]["content"]
+        resultado = resposta.choices[0].message.content
         return jsonify({"resultado": resultado})
     except Exception as e:
         return jsonify({"erro": str(e)})
-
-if __name__ == "__main__":
-    import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
