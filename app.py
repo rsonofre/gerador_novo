@@ -5,18 +5,17 @@ import openai
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://illustrious-sable-2979ca.netlify.app"])
 
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@app.route("/gerar_busca", methods=["POST"])
+@app.route("/gerar", methods=["POST"])
 def gerar_busca():
-    data = request.get_json()
-
-    populacao = data.get("populacao", "")
-    intervencao = data.get("intervencao", "")
-    comparacao = data.get("comparacao", "")
-    desfecho = data.get("desfecho", "")
+    dados = request.get_json()
+    populacao = dados.get("populacao", "")
+    intervencao = dados.get("intervencao", "")
+    comparacao = dados.get("comparacao", "")
+    desfecho = dados.get("desfecho", "")
 
     prompt = f"""
 Você é um especialista em estratégias avançadas de busca científica, com experiência na construção de estratégias eficazes para o PubMed.
@@ -39,17 +38,16 @@ Informações fornecidas:
 """
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.4,
-            max_tokens=600
+        resposta = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
         )
-
-        resultado = response.choices[0].message.content.strip()
-        return jsonify({"resposta": resultado})
+        resultado = resposta.choices[0].message.content
+        return jsonify({"resultado": resultado})
     except Exception as e:
-        return jsonify({"erro": str(e)}), 500
+        return jsonify({"erro": str(e)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(debug=True)
