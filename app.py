@@ -1,9 +1,10 @@
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
 
 app = Flask(__name__)
-CORS(app, origins=["https://illustrious-sable-2979ca.netlify.app"])
+CORS(app)  # Libera todas as origens temporariamente para evitar problemas de CORS
 
 openai.api_key = "sua_chave_api_aqui"
 
