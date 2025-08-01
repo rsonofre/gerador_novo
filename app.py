@@ -1,12 +1,15 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
 
 app = Flask(__name__)
-CORS(app)  # Libera todas as origens temporariamente para evitar problemas de CORS
+CORS(app)  # Libera CORS para todas as origens — usar apenas para teste
 
 openai.api_key = "sua_chave_api_aqui"
+
+@app.route("/", methods=["GET"])
+def home():
+    return "Backend está rodando", 200
 
 @app.route("/gerar", methods=["POST"])
 def gerar_busca():
